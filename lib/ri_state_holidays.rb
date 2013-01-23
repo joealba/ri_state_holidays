@@ -1,13 +1,10 @@
 # Much of this code comes right from the Holidays Ruby gem (https://github.com/alexdunae/holidays)
 # I created a separate gem rather than creating an ri_state_holidays 'region' because
-#   I did not want to modify the Date class.
+#   I wanted to keep the Date class unmodified.
 
-## http://sos.ri.gov/library/stateholidays/
+## RI state holiday information from http://sos.ri.gov/library/stateholidays/
 
-## Static
 # New year's day, 4th of July, Christmas
-
-## Calculated
 # Dr. Martin Luther King Jr's Birthday - Third Monday in January
 # Memorial Day - Last Monday in May
 # Victory Day - Second Monday in August
@@ -16,22 +13,16 @@
 # Election Day - Tuesday after the First Monday in November
 # Thanksgiving - Fourth Thursday in November
 
+require 'date'
+require 'digest/md5'
 
 module RiStateHolidays
-  require 'date'
-  require 'digest/md5'
-
-  VERSION = "0.0.1"
-
   WEEKS = {:first => 1, :second => 2, :third => 3, :fourth => 4, :fifth => 5, :last => -1, :second_last => -2, :third_last => -3}
   MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
   DAY_SYMBOLS = Date::DAYNAMES.collect { |n| n.downcase.intern }
 
-  @@proc_cache = {}
-
-
   def self.holiday?(d)
-    !self.between(d, d).empty?
+    !holiday(d).empty?
   end
 
   def self.holiday(d)
@@ -39,7 +30,7 @@ module RiStateHolidays
   end
 
   def self.holidays_by_month
-    @holidays_by_month ||= holidays_by_month
+    @holidays_by_month ||= get_holidays_by_month
   end
 
 
@@ -71,14 +62,13 @@ module RiStateHolidays
     dates = {}
     (start_date..end_date).each do |date|
       # Always include month '0' for variable-month holidays
-      dates[date.year] = [0] unless dates[date.year]      
+      dates[date.year] = [0] unless dates[date.year]
       # TODO: test this, maybe should push then flatten
       dates[date.year] << date.month unless dates[date.year].include?(date.month)
     end
 
     dates.each do |year, months|
       months.each do |month|
-        # next unless hbm = @@holidays_by_month[month]
         next unless hbm = holidays_by_month[month]
 
         hbm.each do |h|
@@ -121,7 +111,7 @@ module RiStateHolidays
   end
 
 
-  def self.holidays_by_month
+  def self.get_holidays_by_month
     {
       1 => [
         {:mday => 1, :observed => lambda { |date| to_weekday_if_weekend(date) }, :observed_id => "to_weekday_if_weekend", :name => "New Year's Day", :regions => [:us, :us_ri]},
@@ -145,8 +135,8 @@ module RiStateHolidays
       ],
       11 => [
         {:mday => 11, :observed => lambda { |date| to_weekday_if_weekend(date) }, :observed_id => "to_weekday_if_weekend", :name => "Veterans Day", :regions => [:us, :us_ri]},
-        {:wday => 4, :week => 4, :name => "Thanksgiving", :regions => [:us, :us_ri]}
-        # {:function => lambda { |year| us_election_day(year) }, :function_id => "us_election_day(year)", :name => "Election Day", :regions => [:us_ri]}
+        {:wday => 4, :week => 4, :name => "Thanksgiving", :regions => [:us, :us_ri]},
+        {:function => lambda { |year| us_election_day(year) }, :function_id => "us_election_day(year)", :name => "Election Day", :regions => [:us_ri]}
       ],
       12 => [
         {:mday => 25, :observed => lambda { |date| to_weekday_if_weekend(date) }, :observed_id => "to_weekday_if_weekend", :name => "Christmas Day", :regions => [:us, :us_ri]}
@@ -160,13 +150,25 @@ module RiStateHolidays
     year % 4 == 1 ? 20 : nil
   end
 
+
+  # Return the Tuesday after the first Monday
   def self.us_election_day(year)
+    month = 11
+    mday = 1
     if year % 2 == 0
-      # Return the Tuesday after the first Monday
-      
+      date = Date.civil(year, month, mday)
+      if date.wday < 2
+        return date + (2 - date.wday)
+      elsif date.wday == 2
+        return date + 7
+      elsif date.wday > 2
+        return date + (9 - date.wday)
+      end
     end
+
     return nil
   end
+
 
   def self.to_weekday_if_weekend(date)
     date += 1 if date.wday == 0
@@ -199,8 +201,7 @@ module RiStateHolidays
 
   def self.call_proc(function, year) # :nodoc:
     proc_key = Digest::MD5.hexdigest("#{function.to_s}_#{year.to_s}")
-    @@proc_cache[proc_key] = function.call(year) unless @@proc_cache[proc_key]
-    @@proc_cache[proc_key]
+    function.call(year)
   end
 
   def self.parse_options(options)

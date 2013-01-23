@@ -1,8 +1,9 @@
 require 'spec_helper'
+
 describe RiStateHolidays do
 
   describe "easy day-of-month holidays" do
-    it "knows New Years when it falls on a weekday" do
+    it "knows New Years Day" do
       RiStateHolidays.holiday?(Date.new(2013, 1, 1)).should be_true
     end
 
@@ -51,10 +52,9 @@ describe RiStateHolidays do
     end
 
     it "knows election day" do
-      pending "Calculating the Tuesday after the first Monday is annoying"
-      # RiStateHolidays.holiday?(Date.new(2012, 11, 6)).should be_true
-      # RiStateHolidays.holiday?(Date.new(2013, 11, 5)).should be_false
-      # RiStateHolidays.holiday?(Date.new(2014, 11, 4)).should be_true
+      RiStateHolidays.holiday?(Date.new(2012, 11, 6)).should be_true
+      RiStateHolidays.holiday?(Date.new(2013, 11, 5)).should be_false
+      RiStateHolidays.holiday?(Date.new(2014, 11, 4)).should be_true
     end
 
     it "knows Thanksgiving" do

@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+
 Gem::Specification.new do |gem|
   gem.authors       = ["Joseph Alba"]
   gem.email         = ["jalba@egov.com"]
@@ -7,11 +8,13 @@ Gem::Specification.new do |gem|
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
-  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  gem.executables   = ['ri_state_holiday']
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "ri_state_holidays"
   gem.require_paths = ["lib"]
-  gem.version       = RiStateHolidays::VERSION
 
-  gem.add_development_dependency "rspec", "~> 2.11.0"
+  gem.version       = '0.1.0'
+
+  gem.add_development_dependency "rspec"
+  gem.add_development_dependency "rake"
 end

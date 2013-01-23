@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require 'ri_state_holidays'
+
+########################################
+date = STDIN.tty? ? ARGV[0] : STDIN.read
+if date
+  begin
+    date = Date.parse date
+  rescue
+    puts "ERROR: Invalid date -- unable to parse input"
+    exit 2
+  end
+end
+date ||= Date.today
+
+
+########################################
+if [0,6].include? date.wday
+  puts "ERROR: #{date.strftime('%B %d, %Y')} is a weekend day"
+  exit 2
+end
+
+is_holiday = RiStateHolidays.holiday? date
+
+if is_holiday
+  puts "YES: #{date.strftime('%B %d, %Y')} is a Rhode Island state holiday - #{RiStateHolidays.holiday(date).first[:name]}"
+  exit 1
+else
+  puts "NO: #{date.strftime('%B %d, %Y')} is not a Rhode Island state holiday"
+  exit 0
+end
+
