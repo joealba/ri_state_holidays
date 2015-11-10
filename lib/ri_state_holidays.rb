@@ -172,7 +172,7 @@ module RiStateHolidays
 
   def self.to_weekday_if_weekend(date)
     date += 1 if date.wday == 0
-    date -= 1 if date.wday == 6
+    date += 2 if date.wday == 6
     date
   end
   private_class_method :to_weekday_if_weekend

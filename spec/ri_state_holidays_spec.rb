@@ -30,6 +30,11 @@ describe RiStateHolidays do
     it "observed Veterans Day from a Sunday" do
       expect(RiStateHolidays.holiday?(Date.new(2012, 11, 12))).to eq(true)
     end
+
+    it 'observed a Saturday holiday on the following Monday, not the previous Friday' do
+      expect(RiStateHolidays.holiday?(Date.new(2015, 7, 3))).to eq(false)
+      expect(RiStateHolidays.holiday?(Date.new(2015, 7, 6))).to eq(true)
+    end
   end
 
 
