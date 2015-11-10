@@ -34,9 +34,6 @@ module RiStateHolidays
   end
 
 
-  private
-
-
   def self.between(start_date, end_date, *options)
     # remove the timezone
     start_date = start_date.new_offset(0) + start_date.offset if start_date.respond_to?(:new_offset)
@@ -143,12 +140,14 @@ module RiStateHolidays
       ]
     }
   end
+  private_class_method :get_holidays_by_month
 
 
   # January 20, every fourth year, following Presidential election
   def self.us_inauguration_day(year)
     year % 4 == 1 ? 20 : nil
   end
+  private_class_method :us_inauguration_day
 
 
   # Return the Tuesday after the first Monday
@@ -168,6 +167,7 @@ module RiStateHolidays
 
     return nil
   end
+  private_class_method :us_election_day
 
 
   def self.to_weekday_if_weekend(date)
@@ -175,6 +175,7 @@ module RiStateHolidays
     date -= 1 if date.wday == 6
     date
   end
+  private_class_method :to_weekday_if_weekend
 
 
   def self.calculate_mday(year, month, week, wday)
@@ -191,18 +192,22 @@ module RiStateHolidays
     if week > 0
       return ((week - 1) * 7) + 1 + ((wday - Date.civil(year, month,(week-1)*7 + 1).wday) % 7)
     end
-    
+
     days = MONTH_LENGTHS[month-1]
 
     days = 29 if month == 2 and Date.leap?(year)
-      
+
     return days - ((Date.civil(year, month, days).wday - wday + 7) % 7) - (7 * (week.abs - 1))
   end
+  private_class_method :calculate_mday
+
 
   def self.call_proc(function, year) # :nodoc:
     proc_key = Digest::MD5.hexdigest("#{function.to_s}_#{year.to_s}")
     function.call(year)
   end
+  private_class_method :call_proc
+
 
   def self.parse_options(options)
     regions = [:us_ri]
@@ -210,6 +215,6 @@ module RiStateHolidays
     informal = nil
     return regions, observed, informal
   end
-
+  private_class_method :parse_options
 
 end
