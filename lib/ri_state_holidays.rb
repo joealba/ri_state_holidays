@@ -113,7 +113,6 @@ module RiStateHolidays
       1 => [
         {:mday => 1, :observed => lambda { |date| to_weekday_if_weekend(date) }, :observed_id => "to_weekday_if_weekend", :name => "New Year's Day", :regions => [:us, :us_ri]},
         {:wday => 1, :week => 3, :name => "Martin Luther King, Jr. Day", :regions => [:us, :us_ri]},
-        {:function => lambda { |year| us_inauguration_day(year) }, :function_id => "us_inauguration_day(year)", :name => "Inauguration Day", :regions => [:us_dc, :us_ri]}
       ],
       5 => [
         {:wday => 1, :week => -1, :name => "Memorial Day", :regions => [:us, :us_ri]},
@@ -141,13 +140,6 @@ module RiStateHolidays
     }
   end
   private_class_method :get_holidays_by_month
-
-
-  # January 20, every fourth year, following Presidential election
-  def self.us_inauguration_day(year)
-    year % 4 == 1 ? 20 : nil
-  end
-  private_class_method :us_inauguration_day
 
 
   # Return the Tuesday after the first Monday
