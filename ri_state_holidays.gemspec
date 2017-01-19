@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.name          = "ri_state_holidays"
   gem.require_paths = ["lib"]
 
-  gem.version       = '0.1.2'
+  gem.version       = '0.2.0'
 
   gem.add_development_dependency "rspec", ">= 3.0.0"
   gem.add_development_dependency "rake"
